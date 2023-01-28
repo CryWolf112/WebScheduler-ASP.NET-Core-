@@ -1,0 +1,170 @@
+﻿@model WebScheduler.ViewModels.AppointmentsViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    string date = ((DateTime)TempData["Date"]).ToString("yyyy-MM-dd");
+}
+
+<div class="my-3" style="height: 2.7rem; max-width: 37rem">
+    <div class="d-flex gap-2">
+        <form method="post">
+            <img src="~/storage/plus-square-dotted.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2" data-bs-toggle="modal" data-bs-target="#itemAddModal" title="Add new item">
+            <div class="modal fade" id="itemAddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Create Appointment</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input asp-for="Appointment.Title" type="text" class="form-control" id="title" required>
+                            </div>
+                            <div class="d-flex gap-5">
+                                <div class="mb-3 col">
+                                    <label for="stats" class="form-label">Starts at</label>
+                                    <input asp-for="Appointment.StartsAt" type="time" id="starts" class="form-control" required>
+                                </div>
+                                <div class="mb-3 col">
+                                    <label for="ends" class="form-label">Ends at</label>
+                                    <input asp-for="Appointment.EndsAt" type="time" id="ends" class="form-control">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea asp-for="Appointment.Description" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button asp-controller="user" asp-action="create" asp-route-date="@TempData["Date"]" type="submit" class="btn btn-primary">Add appointment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="post" class="d-flex gap-2">
+            <input asp-for="Date" type="date" value="@date" class="form-control me-auto">
+            <input asp-controller="user" asp-action="search" asp-route-date="@TempData["Date"]" src="~/storage/search.svg" type="image" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2" title="Search">
+        </form>
+    </div>
+</div>
+
+@if (((List<Appointment>)ViewBag.Appointments).Count > 0)
+{
+    List<Appointment> appointments = ViewBag.Appointments;
+    foreach (Appointment appointment in appointments)
+    {
+        <div class="card mx-auto my-2" style="height: 4.5rem">
+            <div class="card-body text-start text-light">
+                <div class="d-flex">
+                    <div class="w-25 my-auto wrap" style="font-size:calc(10px + 1vw)">
+                        @appointment.Title
+                    </div>
+                    <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw)">
+                        @appointment.Description
+                    </div>
+                    <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw)">
+                        Starts at: @appointment.StartsAt.ToString("HH:mm")
+                    </div>
+
+                    @if (appointment.StartsAt > DateTime.Now)
+                    {
+                        <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw);color: lightgreen">
+                            Status: Active
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw);color: orange">
+                            Status: Passed
+                        </div>
+                    }
+
+
+                    <div class="d-flex ms-auto gap-2">
+                        <form method="post">
+                            <input asp-for="Appointment.Id" value="@appointment.Id" type="hidden">
+                            <img src="~/storage/update.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2 text-dark" data-bs-toggle="modal" data-bs-target="#updateModal-@appointment.Id" title="Update">
+                            <div class="modal fade" id="updateModal-@appointment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-dark">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Update Appointment</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="title" class="form-label">Title</label>
+                                                <input asp-for="Appointment.Title" value="@appointment.Title" type="text" class="form-control" id="title" required>
+                                            </div>
+                                            <div class="d-flex gap-5">
+                                                <div class="mb-3 col">
+                                                    <label for="stats" class="form-label">Starts at</label>
+                                                    <input asp-for="Appointment.StartsAt" value="@appointment.StartsAt.ToString("hh:mm")" type="time" id="starts" class="form-control" required>
+                                                </div>
+                                                <div class="mb-3 col">
+                                                    <label for="ends" class="form-label">Ends at</label>
+                                                    @{
+                                                        string time = string.Empty;
+                                                        if (appointment.EndsAt != null)
+                                                        {
+                                                            time = ((DateTime)appointment.EndsAt).ToString("hh:mm");
+                                                        }
+
+                                                        <input asp-for="Appointment.EndsAt" value="@time" type="time" id="ends" class="form-control">
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="description" class="form-label">Description</label>
+                                                <textarea asp-for="Appointment.Description" class="form-control">@appointment.Description</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button asp-controller="user" asp-action="update" asp-route-date="@TempData["Date"]" type="submit" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form method="post">
+                            <input asp-for="Appointment.Id" value="@appointment.Id" type="hidden">
+                            <img src="~/storage/trash.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2" data-bs-toggle="modal" data-bs-target="#deleteModal-@appointment.Id" title="Delete">
+                            <div class="modal fade" id="deleteModal-@appointment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-dark">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Delete Appointment</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this appointment?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button asp-controller="user" asp-action="delete" asp-route-date="@TempData["Date"]" type="submit" class="btn btn-danger">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card mx-auto my-5" style="width: 36rem;">
+        <div class="card-body text-center text-light">
+            <h4>You currently don't any appointments</h4>
+            <h6>Add appointments by clicking blue plus button in top left corner</h6>
+        </div>
+    </div>
+}

@@ -1,0 +1,112 @@
+﻿@model WebScheduler.ViewModels.AdminDashboardViewModel
+
+
+@if (((List<User>)ViewBag.Users).Count > 0)
+{
+    List<User> users = ViewBag.Users;
+    foreach (User user in users)
+    {
+        <div class="card mx-auto my-2" style="height: 4.5rem">
+            <div class="card-body text-start text-light">
+                <div class="d-flex">
+                    <div class="w-25 my-auto wrap" style="font-size:calc(10px + 1vw)">
+                        @user.UserName
+                    </div>
+                    <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw)">
+                        @user.Email
+                    </div>
+                    <div class="w-25 my-auto wrap" style="font-size:calc(8px + 0.6vw)">
+                        @user.DateCreated.ToLongDateString()
+                    </div>
+
+
+                    <div class="d-flex ms-auto gap-2">
+                        <form method="post">
+                            <input asp-for="Id" value="@user.Id" type="hidden">
+                            <img src="~/storage/arrow-repeat.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2 text-dark" data-bs-toggle="modal" data-bs-target="#resetModal-@user.Id" title="Update">
+                            <div class="modal fade" id="resetModal-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog text-dark">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Reset Password</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">New Password</label>
+                                                <input asp-for="Password" type="password" class="form-control" id="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).*$" title="The password must contain at least one upper letter, digit and special character" onchange="validatePassword()" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="repeat" class="form-label">Repeat password</label>
+                                                <input asp-for="RepeatPassword" type="password" class="form-control" id="repeat" onkeyup="validatePassword()">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button asp-controller="admin" asp-action="reset" type="submit" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form method="post">
+                            <input asp-for="Id" value="@user.Id" type="hidden">
+                            @if (user.LockoutEnd == null || user.LockoutEnd < DateTime.Now)
+                            {
+                                <img src="~/storage/person-x.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2 text-dark" data-bs-toggle="modal" data-bs-target="#disableModal-@user.Id" title="Disable account">
+                                <div class="modal fade" id="disableModal-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog text-dark">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Disable Account</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to disable @user.UserName's account?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button asp-controller="admin" asp-action="disable" type="submit" class="btn btn-danger">Disable</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <img src="~/storage/person-check.svg" width="42" height="42" draggable="false" class="img-fluid news-tool rounded-3 p-2 text-dark" data-bs-toggle="modal" data-bs-target="#disableModal-@user.Id" title="Disable account">
+                                <div class="modal fade" id="disableModal-@user.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog text-dark">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Disable Account</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to enable @user.UserName's account?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button asp-controller="admin" asp-action="enable" type="submit" class="btn btn-success">Enable</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card mx-auto my-5" style="width: 36rem;">
+        <div class="card-body text-center text-light">
+            <h4>There are no users!</h4>
+        </div>
+    </div>
+}

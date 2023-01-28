@@ -1,0 +1,33 @@
+﻿@model WebScheduler.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<form asp-controller="account" asp-action="authenticate" method="POST">
+    <div class="card mx-auto my-3" style="width: 18rem;">
+        <div class="card-header">
+            <h3>Log In</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-column justify-content-end text-start">
+                <div class="mb-3">
+                    <label for="input" class="form-label">Username or email</label>
+                    <input asp-for="Input" type="text" name="input" class="form-control" id="input" required>
+                </div>
+                <div class="mb-3">
+                    <label for="inputPassword" class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control" id="inputPassword">
+                </div>
+
+                <a href="/forgotPassword" class="mb-3 mt-1">Forgot password?</a>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="Remember" type="checkbox" name="remember" class="form-check-input" id="checkboxRemember">
+                    <label class="form-check-label" for="checkboxRemember">Remember me</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </div>
+    </div>
+</form>
